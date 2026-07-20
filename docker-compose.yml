@@ -1,0 +1,36 @@
+services:
+  web:
+    container_name: 'short-chainsaw'
+    build: .
+    ports:
+      - "80:80"
+    environment:
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:?RAILS_MASTER_KEY is required, see config/master.key}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: short_chainsaw_production
+    volumes:
+      - storage:/rails/storage
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: short_chainsaw_production
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  storage:
+  db_data:

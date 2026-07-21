@@ -28,5 +28,11 @@ module ShortChainsaw
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    # Devise/Warden expect a session store to be present even though the JWT
+    # strategy itself is stateless.
+    config.session_store :cookie_store, key: "_short_chainsaw_session"
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use config.session_store, config.session_options
   end
 end

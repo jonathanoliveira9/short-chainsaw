@@ -3,7 +3,7 @@ services:
     container_name: 'short-chainsaw'
     build: .
     ports:
-      - "80:80"
+      - "3000:80"
     environment:
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:?RAILS_MASTER_KEY is required, see config/master.key}
       DB_HOST: db

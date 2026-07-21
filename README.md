@@ -16,7 +16,7 @@ This is a project to apply system design about short link.
 RAILS_MASTER_KEY=$(cat config/master.key) docker compose up --build
 ```
 
-The app will be available at [http://localhost](http://localhost).
+The app will be available at [http://localhost:3000](http://localhost:3000).
 
 To run it in the background:
 
@@ -53,3 +53,41 @@ docker compose down
    ```
 
 The app will be available at [http://localhost:3000](http://localhost:3000).
+
+## Authentication
+
+Authentication is handled by Devise + [devise-jwt](https://github.com/waiting-for-dev/devise-jwt). A user has an `email` and a `password`.
+
+### Create a user
+
+```sh
+curl --location 'http://localhost:3000/sign_up' \
+--header 'Content-Type: application/json' \
+--data-raw '{"user":{"email":"admin@gmail.com","password":"supersecret","password_confirmation":"supersecret"}}'
+```
+
+The response contains the JWT in the `Authorization` response header (`Bearer <token>`).
+
+### Log in
+
+```sh
+curl --location 'http://localhost:3000/login' \
+--header 'Content-Type: application/json' \
+--data-raw '{"user":{"email":"admin@gmail.com","password":"supersecret"}}'
+```
+
+### Call a protected endpoint
+
+Pass the token from the `Authorization` header above on subsequent requests:
+
+```sh
+curl --location 'http://localhost:3000/me' \
+--header 'Authorization: Bearer <token>'
+```
+
+### Log out
+
+```sh
+curl --location --request DELETE 'http://localhost:3000/logout' \
+--header 'Authorization: Bearer <token>'
+```

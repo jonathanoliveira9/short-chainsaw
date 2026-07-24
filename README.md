@@ -91,3 +91,50 @@ curl --location 'http://localhost:3000/me' \
 curl --location --request DELETE 'http://localhost:3000/logout' \
 --header 'Authorization: Bearer <token>'
 ```
+
+## Links
+
+Endpoints for creating and resolving short links. `generate`, `update` and `destroy` require the `Authorization: Bearer <token>` header (see [Authentication](#authentication)); `show` (the redirect) is public. A link can only be updated or destroyed by the user who created it.
+
+### Generate a short link
+
+```sh
+curl --location 'http://localhost:3000/links/generate' \
+--header 'Authorization: Bearer <token>' \
+--header 'Content-Type: application/json' \
+--data-raw '{"link":"https://example.com/some/very/long/path"}'
+```
+
+Returns `201 Created`:
+
+```json
+{ "short_link": "<code>", "expires_at": "<datetime>" }
+```
+
+### Resolve (redirect) a short link
+
+```sh
+curl --location 'http://localhost:3000/links/<short_link>'
+```
+
+Returns `302 Found` with a `Location` header pointing at the original link. A missing, inactive or expired short link returns `404 Not Found`.
+
+### Update a short link's destination
+
+```sh
+curl --location --request PATCH 'http://localhost:3000/links/<short_link>' \
+--header 'Authorization: Bearer <token>' \
+--header 'Content-Type: application/json' \
+--data-raw '{"link":"https://example.com/new/destination"}'
+```
+
+Returns `200 OK`.
+
+### Delete a short link
+
+```sh
+curl --location --request DELETE 'http://localhost:3000/links/<short_link>' \
+--header 'Authorization: Bearer <token>'
+```
+
+Returns `204 No Content`.

@@ -13,6 +13,12 @@ Rails.application.routes.draw do
 
   get "me" => "me#show"
 
+  resources :links, param: :short_link, only: [ :show, :update, :destroy ] do
+    collection do
+      post :generate
+    end
+  end
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check

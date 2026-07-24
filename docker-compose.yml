@@ -12,6 +12,7 @@ services:
       DB_PASSWORD: postgres
       DB_NAME: short_chainsaw_production
     volumes:
+      - .:/rails
       - storage:/rails/storage
     depends_on:
       db:

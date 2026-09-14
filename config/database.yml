@@ -22,15 +22,41 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
 development:
-  <<: *default
-  database: short_chainsaw_development
+  primary:
+    <<: *default
+    database: short_chainsaw_development
+  shard_one:
+    <<: *default
+    database: short_chainsaw_development_shard_one
+    migrations_paths: db/shard_migrate
+  shard_two:
+    <<: *default
+    database: short_chainsaw_development_shard_two
+    migrations_paths: db/shard_migrate
+  shard_three:
+    <<: *default
+    database: short_chainsaw_development_shard_three
+    migrations_paths: db/shard_migrate
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
-  <<: *default
-  database: short_chainsaw_test
+  primary:
+    <<: *default
+    database: short_chainsaw_test
+  shard_one:
+    <<: *default
+    database: short_chainsaw_test_shard_one
+    migrations_paths: db/shard_migrate
+  shard_two:
+    <<: *default
+    database: short_chainsaw_test_shard_two
+    migrations_paths: db/shard_migrate
+  shard_three:
+    <<: *default
+    database: short_chainsaw_test_shard_three
+    migrations_paths: db/shard_migrate
 
 production:
   primary:
@@ -48,3 +74,15 @@ production:
     <<: *default
     database: <%= ENV.fetch("DB_NAME", "short_chainsaw_production") %>_cable
     migrations_paths: db/cable_migrate
+  shard_one:
+    <<: *default
+    database: <%= ENV.fetch("DB_NAME", "short_chainsaw_production") %>_shard_one
+    migrations_paths: db/shard_migrate
+  shard_two:
+    <<: *default
+    database: <%= ENV.fetch("DB_NAME", "short_chainsaw_production") %>_shard_two
+    migrations_paths: db/shard_migrate
+  shard_three:
+    <<: *default
+    database: <%= ENV.fetch("DB_NAME", "short_chainsaw_production") %>_shard_three
+    migrations_paths: db/shard_migrate

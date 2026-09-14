@@ -7,7 +7,9 @@ class CreateLinks < ActiveRecord::Migration[8.1]
       t.string :short_link, null: false
       t.datetime :expires_at
       t.boolean :active, null: false, default: true
-      t.references :user, null: false, foreign_key: true
+      # No `foreign_key: true`: users live on the primary database while
+      # links are sharded, and Postgres cannot enforce a cross-database FK.
+      t.references :user, null: false
 
       t.timestamps
     end

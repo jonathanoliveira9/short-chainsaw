@@ -1,5 +1,5 @@
 up:
-	RAILS_MASTER_KEY=$$(cat config/master.key) docker compose up --build
+	RAILS_MASTER_KEY=$$(cat config/master.key) docker compose up
 
 down:
 	RAILS_MASTER_KEY=$$(cat config/master.key) docker compose down

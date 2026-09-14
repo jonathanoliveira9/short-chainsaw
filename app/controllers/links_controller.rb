@@ -2,10 +2,10 @@
 
 class LinksController < ApplicationController
   before_action :authenticate_user!, except: [ :show ]
-  before_action :set_link, only: [ :update, :destroy ]
 
   rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
   rescue_from ActiveRecord::RecordInvalid, with: :render_invalid
+  rescue_from ShortCodeGenerator::UnavailableError, with: :render_service_unavailable
 
   def generate
     link = Link.generate_for(user: current_user, long_link: link_param)
@@ -14,26 +14,29 @@ class LinksController < ApplicationController
   end
 
   def show
-    link = Link.available.find_by!(short_link: params[:short_link])
+    link = Link.on_shard_for(params[:short_link]) { Link.available.find_by!(short_link: params[:short_link]) }
 
     response.set_header("Location", link.long_link)
     head :found
   end
 
   def update
-    @link.update!(long_link: link_param)
+    Link.on_shard_for(params[:short_link]) { find_owned_link!.update!(long_link: link_param) }
     head :ok
   end
 
   def destroy
-    @link.destroy!
+    Link.on_shard_for(params[:short_link]) { find_owned_link!.destroy! }
     head :no_content
   end
 
   private
 
-  def set_link
-    @link = current_user.links.find_by!(short_link: params[:short_link])
+  # Must run inside the same `on_shard_for` block as the find (and any
+  # mutation), since the shard context is only active for that block's
+  # duration.
+  def find_owned_link!
+    current_user.links.find_by!(short_link: params[:short_link])
   end
 
   def link_param
@@ -42,6 +45,10 @@ class LinksController < ApplicationController
 
   def render_not_found
     head :not_found
+  end
+
+  def render_service_unavailable
+    head :service_unavailable
   end
 
   def render_invalid(exception)
